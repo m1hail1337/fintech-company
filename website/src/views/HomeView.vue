@@ -8,10 +8,10 @@
 
     <div class="container">
       <form v-if="this.step == 0" @submit.prevent="submit">
-        <label for="fname">Имя</label>
+        <label for="fisrt_name">Имя</label>
         <input type="text" v-model="form.first_name" name="firstname">
 
-        <label for="lname">Фамилия</label>
+        <label for="last_name">Фамилия</label>
         <input type="text" v-model="form.last_name" name="lastname">
 
         <label for="email">Email</label>
