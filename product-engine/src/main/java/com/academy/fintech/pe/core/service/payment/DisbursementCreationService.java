@@ -57,7 +57,6 @@ public class DisbursementCreationService {
         BigDecimal principal = agreement.getPrincipalAmount();
         BigDecimal interest = agreement.getInterest();
         for (int currentPeriod = 1; currentPeriod <= periods; currentPeriod++) {
-            currentDate = currentDate.plusMonths(1);
             PaymentUnit unit = new PaymentUnit(
                     schedule.getId(),
                     PaymentUnitStatus.FUTURE.name(),
@@ -67,6 +66,7 @@ public class DisbursementCreationService {
                     FinancialFunction.ppmt(interest, currentPeriod, periods, principal),
                     currentPeriod
             );
+            currentDate = currentDate.plusMonths(1);
             paymentUnits.add(unit);
         }
         return paymentUnits;
