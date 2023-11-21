@@ -1,6 +1,10 @@
 package com.academy.fintech.pe.grpc;
 
-import com.academy.fintech.pe.*;
+import com.academy.fintech.pe.AgreementRequest;
+import com.academy.fintech.pe.AgreementResponse;
+import com.academy.fintech.pe.DisbursementCreationRequest;
+import com.academy.fintech.pe.DisbursementCreationResponse;
+import com.academy.fintech.pe.ProductEngineServiceGrpc;
 import com.academy.fintech.pe.core.service.agreement.AgreementCreationService;
 import com.academy.fintech.pe.core.service.payment.DisbursementCreationService;
 import io.grpc.stub.StreamObserver;
