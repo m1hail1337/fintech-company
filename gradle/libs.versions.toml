@@ -1,5 +1,6 @@
 [versions]
 spring-boot = "3.1.4"
+testcontainers = "1.18.3"
 
 [plugins]
 spring = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -24,5 +25,7 @@ grpc-stub = { module = "io.grpc:grpc-stub", version = "1.55.1" }
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "3.23.0" }
 
 #Test libraries
-testcontainers-core = { module = "org.testcontainers:testcontainers", version = "1.19.1" }
+testcontainers-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+spring-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot"}
 jupiter = { module = "org.junit.jupiter:junit-jupiter", version = "5.10.0" }

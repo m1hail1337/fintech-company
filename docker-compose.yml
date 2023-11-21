@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: fintech
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
     ports:
       - "61156:5432"
     volumes:

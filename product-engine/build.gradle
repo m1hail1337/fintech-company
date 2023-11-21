@@ -11,7 +11,10 @@ dependencies {
     implementation libs.grpc.stub
     implementation libs.protobuf.java
 
-    implementation libs.jupiter
+    testImplementation libs.jupiter
+    testImplementation libs.testcontainers.jupiter
+    testImplementation libs.testcontainers.postgres
+    testImplementation libs.spring.test
 }
 
 protobuf {

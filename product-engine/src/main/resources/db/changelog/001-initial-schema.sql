@@ -26,12 +26,12 @@ CREATE TABLE Agreement (
 
 CREATE TABLE Payment_Schedule (
     id SERIAL PRIMARY KEY,
-    agreement_number INT REFERENCES Agreement(id),
+    agreement_number INT REFERENCES Agreement(id) ON DELETE CASCADE,
     version INT
 );
 
 CREATE TABLE Payment_Schedule_Unit (
-    payment_schedule_id INT REFERENCES Payment_Schedule(id),
+    payment_schedule_id INT REFERENCES Payment_Schedule(id) ON DELETE CASCADE,
     status VARCHAR(40),
     payment_date DATE,
     period_payment DECIMAL(10, 2),
