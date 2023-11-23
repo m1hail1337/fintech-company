@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PaymentUnitRepository extends CrudRepository<PaymentUnit, Long> {
-    List<PaymentUnit> findAllByScheduleId(Long SchedulePaymentId);
+public interface PaymentUnitRepository extends CrudRepository<PaymentUnitDAO, Long> {
+    List<PaymentUnitDAO> findAllByScheduleId(Long SchedulePaymentId);
 }

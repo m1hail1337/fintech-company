@@ -4,14 +4,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @Entity
 @Table(name = "Product")
-public class Product {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductDAO {
     @Id
     @Column(name = "code")
     private String code;
@@ -29,10 +33,10 @@ public class Product {
     private BigDecimal maxPrincipalAmount;
 
     @Column(name = "min_interest")
-    private Integer minInterest;
+    private BigDecimal minInterest;
 
     @Column(name = "max_interest")
-    private Integer maxInterest;
+    private BigDecimal maxInterest;
 
     @Column(name = "min_origination_amount")
     private BigDecimal minOriginationAmount;

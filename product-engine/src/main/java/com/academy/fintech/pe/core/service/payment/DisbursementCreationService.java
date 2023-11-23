@@ -1,11 +1,11 @@
 package com.academy.fintech.pe.core.service.payment;
 
 import com.academy.fintech.pe.core.calculation.FinancialFunction;
-import com.academy.fintech.pe.core.service.agreement.db.Agreement;
+import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.PaymentSchedule;
+import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleDAO;
 import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnit;
+import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitDAO;
 import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitRepository;
 import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +30,12 @@ public class DisbursementCreationService {
 
     public Long createSchedule(Long agreementNumber, LocalDate disbursementDate) {
         int newVersion = getLatestVersion(agreementNumber) + 1;
-        PaymentSchedule schedule = new PaymentSchedule(agreementNumber,  newVersion);
+        PaymentScheduleDAO schedule = new PaymentScheduleDAO(agreementNumber,  newVersion);
+        AgreementDAO agreement = agreementRepository.findById(agreementNumber).orElseThrow();
         scheduleRepository.save(schedule);
 
-        Agreement agreement = agreementRepository.findById(agreementNumber).orElseThrow();
         agreement.setDisbursementDate(disbursementDate);
-        List<PaymentUnit> paymentUnits = createPaymentUnits(agreement, schedule);
+        List<PaymentUnitDAO> paymentUnits = createPaymentUnits(agreement, schedule);
         agreement.setNextPaymentDate(paymentUnits.get(0).getPaymentDate());
         unitRepository.saveAll(paymentUnits);
         agreementRepository.save(agreement);
@@ -50,14 +50,14 @@ public class DisbursementCreationService {
         return latest;
     }
 
-    private List<PaymentUnit> createPaymentUnits(Agreement agreement, PaymentSchedule schedule) {
-        List<PaymentUnit> paymentUnits = new ArrayList<>();
+    private List<PaymentUnitDAO> createPaymentUnits(AgreementDAO agreement, PaymentScheduleDAO schedule) {
+        List<PaymentUnitDAO> paymentUnits = new ArrayList<>();
         int periods = agreement.getTerm();
         LocalDate currentDate = agreement.getDisbursementDate();
         BigDecimal principal = agreement.getPrincipalAmount();
         BigDecimal interest = agreement.getInterest();
         for (int currentPeriod = 1; currentPeriod <= periods; currentPeriod++) {
-            PaymentUnit unit = new PaymentUnit(
+            PaymentUnitDAO unit = new PaymentUnitDAO(
                     schedule.getId(),
                     PaymentUnitStatus.FUTURE.name(),
                     currentDate.plusMonths(1),

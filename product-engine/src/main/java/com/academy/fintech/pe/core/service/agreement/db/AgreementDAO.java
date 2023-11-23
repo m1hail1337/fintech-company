@@ -1,6 +1,5 @@
 package com.academy.fintech.pe.core.service.agreement.db;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,8 +14,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "Agreement")
-@NoArgsConstructor
-public class Agreement {
+public class AgreementDAO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -50,12 +47,12 @@ public class Agreement {
     @Column(name = "next_payment_date")
     private LocalDate nextPaymentDate;
 
-    public Agreement(String product,
-                     Integer clientID,
-                     Integer monthTerm,
-                     BigDecimal interest,
-                     BigDecimal disbursement,
-                     BigDecimal originationAmount) {
+    public AgreementDAO(String product,
+                        Integer clientID,
+                        Integer monthTerm,
+                        BigDecimal interest,
+                        BigDecimal disbursement,
+                        BigDecimal originationAmount) {
         this.clientId = clientID;
         this.term = monthTerm;
         this.productCode = product;

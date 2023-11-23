@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @Table(name = "Payment_Schedule_Unit")
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentUnit {
+public class PaymentUnitDAO {
     @Id
     @Column(name = "payment_schedule_id")
     private Long scheduleId;

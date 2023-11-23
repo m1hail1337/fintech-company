@@ -1,6 +1,6 @@
 package com.academy.fintech.pe.core.service.agreement;
 
-import com.academy.fintech.pe.core.service.agreement.db.Agreement;
+import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
 import com.academy.fintech.pe.core.service.product.db.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class AgreementCreationService {
                                 String productCode) {
         // пока берем минимальный origination
         BigDecimal origination = productRepository.findById(productCode).orElseThrow().getMinOriginationAmount();
-        Agreement agreement = new Agreement(productCode, clientID, monthTerm, interest, disbursement, origination);
+        AgreementDAO agreement = new AgreementDAO(productCode, clientID, monthTerm, interest, disbursement, origination);
         agreementRepository.save(agreement);
         return agreement.getId();
     }

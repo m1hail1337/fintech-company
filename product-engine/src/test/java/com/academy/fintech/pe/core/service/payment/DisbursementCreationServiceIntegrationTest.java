@@ -1,17 +1,22 @@
 package com.academy.fintech.pe.core.service.payment;
 
+import com.academy.fintech.pe.DBContainer;
 import com.academy.fintech.pe.core.service.agreement.AgreementCreationService;
-import com.academy.fintech.pe.core.service.agreement.db.Agreement;
+import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.PaymentSchedule;
+import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleDAO;
 import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnit;
+import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitDAO;
 import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,29 +26,38 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
+@Testcontainers
+@DirtiesContext
 @SpringBootTest
-public class DisbursementCreationServiceTest {
+public class DisbursementCreationServiceIntegrationTest {
+
+    @Container
+    static DBContainer databaseContainer = DBContainer.getInstance();
+
+    @DynamicPropertySource
+    static void postgresqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", databaseContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", databaseContainer::getUsername);
+        registry.add("spring.datasource.password", databaseContainer::getPassword);
+    }
 
     @Autowired
-    private DisbursementCreationService disbursementService;
+    DisbursementCreationService disbursementService;
 
     @Autowired
-    private AgreementCreationService agreementService;
+    AgreementCreationService agreementService;
 
     @Autowired
-    private AgreementRepository agreementRepository;
+    AgreementRepository agreementRepository;
 
     @Autowired
-    private PaymentScheduleRepository scheduleRepository;
+    PaymentScheduleRepository scheduleRepository;
 
     @Autowired
-    private PaymentUnitRepository unitRepository;
+    PaymentUnitRepository unitRepository;
 
-    @BeforeEach
-    void cleanRepository() {
-        agreementRepository.deleteAll();
-        scheduleRepository.deleteAll();
-        unitRepository.deleteAll();
+    @Test
+    void contextLoads() {
     }
 
     @Test
@@ -58,15 +72,15 @@ public class DisbursementCreationServiceTest {
         );
         Long scheduleId = disbursementService.createSchedule(agreementId, disbursementDate);
         assertTrue(scheduleRepository.existsByAgreementNumber(agreementId));
-        PaymentSchedule scheduleQuery = scheduleRepository.findById(scheduleId).orElseThrow();
+        PaymentScheduleDAO scheduleQuery = scheduleRepository.findById(scheduleId).orElseThrow();
         assertEquals(1, scheduleQuery.getVersion());
         assertEquals(agreementId, scheduleQuery.getAgreementNumber());
-        List<PaymentUnit> paymentUnits = unitRepository.findAllByScheduleId(scheduleId);
+        List<PaymentUnitDAO> paymentUnits = unitRepository.findAllByScheduleId(scheduleId);
         assertEquals(12, paymentUnits.size());
         String firstPaymentDate = paymentUnits.stream().filter(unit -> unit.getPeriodNumber() == 1)
                 .findAny().orElseThrow().getPaymentDate().toString();
         assertEquals(disbursementDate.plusMonths(1), LocalDate.parse(firstPaymentDate));
-        Agreement updatedAgreement = agreementRepository.findById(agreementId).orElseThrow();
+        AgreementDAO updatedAgreement = agreementRepository.findById(agreementId).orElseThrow();
         assertEquals(disbursementDate, LocalDate.parse(updatedAgreement.getDisbursementDate().toString()));
         assertEquals(disbursementDate.plusMonths(1), LocalDate.parse(
                 updatedAgreement.getNextPaymentDate().toString()));

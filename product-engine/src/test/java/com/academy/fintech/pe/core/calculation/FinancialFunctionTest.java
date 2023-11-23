@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FinancialFunctionTest {
 
     @Test
-    public void pmtTest() {
+    void pmtTest() {
         assertEquals(BigDecimal.valueOf(-89.17),
                 pmt(BigDecimal.valueOf(0.07), 12, BigDecimal.valueOf(1000)));
         assertEquals(BigDecimal.valueOf(-891.67),
@@ -25,7 +25,7 @@ public class FinancialFunctionTest {
     }
 
     @Test
-    public void ipmtTest() {
+    void ipmtTest() {
         assertEquals(BigDecimal.valueOf(-214.74),
                 ipmt(BigDecimal.valueOf(0.05), 48, 60, BigDecimal.valueOf(120000)));
         assertEquals(BigDecimal.valueOf(-102.88),
@@ -35,7 +35,7 @@ public class FinancialFunctionTest {
     }
 
     @Test
-    public void ppmtTest() {
+    void ppmtTest() {
         assertEquals(BigDecimal.valueOf(-2095.01),
                 ppmt(BigDecimal.valueOf(0.05), 48, 60, BigDecimal.valueOf(120000)));
         assertEquals(BigDecimal.valueOf(-489.88),

@@ -4,7 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PaymentScheduleRepository extends CrudRepository<PaymentSchedule, Long> {
+public interface PaymentScheduleRepository extends CrudRepository<PaymentScheduleDAO, Long> {
     boolean existsByAgreementNumber(Long agreementNumber);
-    PaymentSchedule findFirstByAgreementNumberOrderByVersionDesc(Long agreementNumber);
+    PaymentScheduleDAO findFirstByAgreementNumberOrderByVersionDesc(Long agreementNumber);
 }
