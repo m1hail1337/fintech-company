@@ -12,8 +12,8 @@ service ProductEngineService {
 message AgreementRequest {
   int32 client_id = 1;
   int32 loan_term = 2;
-  double disbursement_amount = 3;
-  double interest = 4;
+  string disbursement_amount = 3;
+  string interest = 4;
   string product_code = 5;
 }
 

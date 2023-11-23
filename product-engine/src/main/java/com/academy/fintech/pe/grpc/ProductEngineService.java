@@ -27,8 +27,8 @@ public class ProductEngineService extends ProductEngineServiceGrpc.ProductEngine
     public void createAgreement(AgreementRequest request, StreamObserver<AgreementResponse> responseObserver) {
         int clientId = request.getClientId();
         int term = request.getLoanTerm();
-        BigDecimal disbursement = BigDecimal.valueOf(request.getDisbursementAmount());
-        BigDecimal interest = BigDecimal.valueOf(request.getInterest());
+        BigDecimal disbursement = new BigDecimal(request.getDisbursementAmount());
+        BigDecimal interest = new BigDecimal(request.getInterest());
         String productCode = request.getProductCode();
         Long agreementId = agreementCreationService.createAgreement(
                 clientId, term, disbursement, interest, productCode
