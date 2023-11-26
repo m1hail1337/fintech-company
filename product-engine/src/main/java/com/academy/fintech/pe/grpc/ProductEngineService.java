@@ -7,7 +7,9 @@ import com.academy.fintech.pe.DisbursementCreationResponse;
 import com.academy.fintech.pe.ProductEngineServiceGrpc;
 import com.academy.fintech.pe.core.service.agreement.AgreementCreationService;
 import com.academy.fintech.pe.core.service.payment.DisbursementCreationService;
+import com.academy.fintech.pe.grpc.dto.AgreementRecord;
 import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 import org.lognet.springboot.grpc.GRpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,24 +17,23 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @GRpcService
+@RequiredArgsConstructor
 public class ProductEngineService extends ProductEngineServiceGrpc.ProductEngineServiceImplBase {
 
-    @Autowired
-    AgreementCreationService agreementCreationService;
+    private final AgreementCreationService agreementCreationService;
 
-    @Autowired
-    DisbursementCreationService disbursementCreationService;
+    private final DisbursementCreationService disbursementCreationService;
 
     @Override
     public void createAgreement(AgreementRequest request, StreamObserver<AgreementResponse> responseObserver) {
-        int clientId = request.getClientId();
-        int term = request.getLoanTerm();
-        BigDecimal disbursement = new BigDecimal(request.getDisbursementAmount());
-        BigDecimal interest = new BigDecimal(request.getInterest());
-        String productCode = request.getProductCode();
-        Long agreementId = agreementCreationService.createAgreement(
-                clientId, term, disbursement, interest, productCode
-        );
+        AgreementRecord agreementToCreate = AgreementRecord.builder()
+                .clientId(request.getClientId())
+                .term(request.getLoanTerm())
+                .disbursement(new BigDecimal(request.getDisbursementAmount()))
+                .interest(new BigDecimal(request.getInterest()))
+                .productCode(request.getProductCode())
+                .build();
+        Long agreementId = agreementCreationService.createAgreement(agreementToCreate);
 
         responseObserver.onNext(
                 AgreementResponse.newBuilder()

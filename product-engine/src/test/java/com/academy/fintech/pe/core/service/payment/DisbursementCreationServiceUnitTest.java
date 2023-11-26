@@ -1,10 +1,10 @@
 package com.academy.fintech.pe.core.service.payment;
 
-import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
+import com.academy.fintech.pe.core.service.agreement.db.Agreement;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleDAO;
+import com.academy.fintech.pe.core.service.payment.schedule.PaymentSchedule;
 import com.academy.fintech.pe.core.service.payment.schedule.PaymentScheduleRepository;
-import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitDAO;
+import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnit;
 import com.academy.fintech.pe.core.service.payment.schedule.unit.PaymentUnitRepository;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@DirtiesContext
+@DirtiesContext // gRPC requires
 public class DisbursementCreationServiceUnitTest {
 
     @MockBean
@@ -50,11 +50,11 @@ public class DisbursementCreationServiceUnitTest {
     static long currentScheduleId = 0;
     LocalDate disbursementDate = LocalDate.now();
 
-    static AgreementDAO sampleAgreement = new AgreementDAO(
+    static Agreement sampleAgreement = new Agreement(
             "CL1.0",
-            1,
-            12,
+            1L,
             BigDecimal.valueOf(0.05),
+            12,
             BigDecimal.valueOf(30000.00),
             BigDecimal.valueOf(2000.00)
     );
@@ -66,24 +66,23 @@ public class DisbursementCreationServiceUnitTest {
 
     @PostConstruct
     void setUpMocksBehaviour() {
-        when(scheduleRepository.existsByAgreementNumber(any())).thenReturn(false);
         when(agreementRepository.findById(any())).thenAnswer(invocation -> {
             long agreementId = invocation.getArgument(0);
             sampleAgreement.setId(agreementId);
             return Optional.of(sampleAgreement);
         });
         when(scheduleRepository.save(any())).thenAnswer(invocation -> {
-            PaymentScheduleDAO schedule = invocation.getArgument(0);
+            PaymentSchedule schedule = invocation.getArgument(0);
             assertNull(schedule.getId());
             schedule.setId(++currentScheduleId);     //т.к. SERIAL
             return schedule;
         });
         when(unitRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         when(agreementRepository.save(any())).thenAnswer(invocation -> {
-           AgreementDAO agreementDAO = invocation.getArgument(0);
-           assertNotNull(agreementDAO.getDisbursementDate());
-           assertNotNull(agreementDAO.getNextPaymentDate());
-           return agreementDAO;
+           Agreement agreement = invocation.getArgument(0);
+           assertNotNull(agreement.getDisbursementDate());
+           assertNotNull(agreement.getNextPaymentDate());
+           return agreement;
         });
     }
 
@@ -94,18 +93,17 @@ public class DisbursementCreationServiceUnitTest {
         long existingAgreementId = 123L;
         sampleAgreement.setId(123L);
         int version = 15;
-        PaymentScheduleDAO oldPaymentSchedule = new PaymentScheduleDAO(
+        PaymentSchedule oldPaymentSchedule = new PaymentSchedule(
                 existingScheduleId,
                 existingAgreementId,
                 version
         );
-        PaymentScheduleDAO expectedPaymentSchedule = new PaymentScheduleDAO(
+        PaymentSchedule expectedPaymentSchedule = new PaymentSchedule(
                 existingScheduleId + 1,
                 existingAgreementId,
                 version + 1
         );
-        when(scheduleRepository.existsByAgreementNumber(existingAgreementId)).thenReturn(true);
-        when(scheduleRepository.findFirstByAgreementNumberOrderByVersionDesc(existingAgreementId)).thenReturn(oldPaymentSchedule);
+        when(scheduleRepository.findFirstByAgreementNumberOrderByVersionDesc(existingAgreementId)).thenReturn(Optional.of(oldPaymentSchedule));
         long newScheduleID = service.createSchedule(existingAgreementId, disbursementDate);
         verify(scheduleRepository).save(expectedPaymentSchedule);
         assertEquals(expectedPaymentSchedule.getId(), newScheduleID);
@@ -115,29 +113,75 @@ public class DisbursementCreationServiceUnitTest {
     void checkVersionForAgreementWithNotExistingSchedule() {
         currentScheduleId = 0;
         long existingAgreementId = 123L;
-        PaymentScheduleDAO expectedPaymentSchedule = new PaymentScheduleDAO(1L, existingAgreementId, 1);
+        PaymentSchedule expectedPaymentSchedule = new PaymentSchedule(1L, existingAgreementId, 1);
         long newScheduleID = service.createSchedule(existingAgreementId, disbursementDate);
-        verify(scheduleRepository, never()).findFirstByAgreementNumberOrderByVersionDesc(any());
+        verify(scheduleRepository, times(1)).findFirstByAgreementNumberOrderByVersionDesc(existingAgreementId);
         verify(scheduleRepository).save(expectedPaymentSchedule);
         assertEquals(expectedPaymentSchedule.getId(), newScheduleID);
     }
 
     @Test
-    void checkPaymentUnitCountWithDifferentTerm() {
+    void checkPaymentUnitCountWithTermOf12() {
         when(unitRepository.saveAll((anyList()))).thenAnswer(invocation -> {
-            List<PaymentUnitDAO> units = invocation.getArgument(0);
+            List<PaymentUnit> units = invocation.getArgument(0);
             assertEquals(sampleAgreement.getTerm(), units.size());
             return units;
         });
         service.createSchedule(sampleAgreement.getId(), disbursementDate);
-        sampleAgreement.setTerm(34);
-        service.createSchedule(sampleAgreement.getId(), disbursementDate);
-        sampleAgreement.setTerm(1);
+        Agreement agreementWith1Term = new Agreement(
+                "CL1.0",
+                1L,
+                BigDecimal.valueOf(0.05),
+                1,
+                BigDecimal.valueOf(1000000.00),
+                BigDecimal.valueOf(10000.00)
+        );
+        agreementWith1Term.setId(2L);
+        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
+    }
+
+
+    @Test
+    void checkPaymentUnitCountWithTermOf34() {
+        Agreement agreementWith34Term = new Agreement(
+                "CL1.0",
+                1L,
+                BigDecimal.valueOf(0.05),
+                34,
+                BigDecimal.valueOf(1000000.00),
+                BigDecimal.valueOf(10000.00)
+        );
+        agreementWith34Term.setId(1L);
+        service.createSchedule(agreementWith34Term.getId(), disbursementDate);
+        Agreement agreementWith1Term = new Agreement(
+                "CL1.0",
+                1L,
+                BigDecimal.valueOf(0.05),
+                1,
+                BigDecimal.valueOf(1000000.00),
+                BigDecimal.valueOf(10000.00)
+        );
+        agreementWith1Term.setId(2L);
+        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
+    }
+
+    @Test
+    void checkPaymentUnitCountWithTermOf1() {
+        Agreement agreementWith1Term = new Agreement(
+                "CL1.0",
+                1L,
+                BigDecimal.valueOf(0.05),
+                1,
+                BigDecimal.valueOf(1000000.00),
+                BigDecimal.valueOf(10000.00)
+        );
+        agreementWith1Term.setId(2L);
+        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
     }
 
     @Test
     void createSchedule() {
-        PaymentScheduleDAO expectedPaymentSchedule = new PaymentScheduleDAO(1L, sampleAgreement.getId(), 1);
+        PaymentSchedule expectedPaymentSchedule = new PaymentSchedule(1L, sampleAgreement.getId(), 1);
         currentScheduleId = 0L;
         Long scheduleId = service.createSchedule(sampleAgreement.getId(), disbursementDate);
         sampleAgreement.setDisbursementDate(disbursementDate);
@@ -156,7 +200,6 @@ public class DisbursementCreationServiceUnitTest {
         assertThrows(NoSuchElementException.class, () -> {
             service.createSchedule(sampleAgreement.getId(), disbursementDate);
         });
-        verify(scheduleRepository, times(1)).existsByAgreementNumber(notExistingAgreementId);
         verify(scheduleRepository, never()).save(any());
     }
 

@@ -1,8 +1,9 @@
 package com.academy.fintech.pe.core.service.agreement;
 
-import com.academy.fintech.pe.DBContainer;
-import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
+import com.academy.fintech.pe.DbContainer;
+import com.academy.fintech.pe.core.service.agreement.db.Agreement;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
+import com.academy.fintech.pe.grpc.dto.AgreementRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 @Transactional
-@DirtiesContext
+@DirtiesContext // gRPC requires
 @SpringBootTest
 public class AgreementCreationServiceIntegrationTest {
 
     @Container
-    static DBContainer databaseContainer = DBContainer.getInstance();
+    static DbContainer databaseContainer = DbContainer.getInstance();
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -55,7 +56,7 @@ public class AgreementCreationServiceIntegrationTest {
                 BigDecimal.valueOf(0.07),
                 "CL1.0"
         );
-        AgreementDAO queryResult = agreementRepository.findById(agreementId).orElseThrow();
+        Agreement queryResult = agreementRepository.findById(agreementId).orElseThrow();
         assertNull(queryResult.getDisbursementDate());
         assertNull(queryResult.getNextPaymentDate());
     }
@@ -69,7 +70,7 @@ public class AgreementCreationServiceIntegrationTest {
                 BigDecimal.valueOf(0.07),
                 "CL1.0"
         );
-        List<AgreementDAO> queryResult = agreementRepository.findByClientId(1);
+        List<Agreement> queryResult = agreementRepository.findByClientId(1L);
         assertEquals(1, queryResult.size());
         assertEquals(expected, queryResult.get(0).getId());
     }
@@ -90,31 +91,33 @@ public class AgreementCreationServiceIntegrationTest {
                 BigDecimal.valueOf(0.05),
                 "CL1.0"
         );
-        List<AgreementDAO> agreementsByQuery = agreementRepository.findByClientId(1);
+        List<Agreement> agreementsByQuery = agreementRepository.findByClientId(1L);
         assertEquals(2, agreementsByQuery.size());
-        List<Long> agreementIDs = agreementsByQuery.stream().map(AgreementDAO::getId).toList();
+        List<Long> agreementIDs = agreementsByQuery.stream().map(Agreement::getId).toList();
         assertTrue(agreementIDs.contains(firstAgreementId));
         assertTrue(agreementIDs.contains(secondAgreementId));
     }
 
     @Test
     void createSameAgreementsForTwoClient() {
-        Long firstClientAgreementId = service.createAgreement(
-                1,
-                12,
-                BigDecimal.valueOf(32000),
-                BigDecimal.valueOf(0.07),
-                "CL1.0"
-        );
-        Long secondClientAgreementId = service.createAgreement(
-                2,
-                12,
-                BigDecimal.valueOf(32000),
-                BigDecimal.valueOf(0.07),
-                "CL1.0"
-        );
-        List<AgreementDAO> agreementsForFirstClient = agreementRepository.findByClientId(1);
-        List<AgreementDAO> agreementsForSecondClient = agreementRepository.findByClientId(2);
+        AgreementRecord firstAgreement = AgreementRecord.builder()
+                .productCode("CL1.0")
+                .clientId(1L)
+                .term(12)
+                .interest(new BigDecimal("0.07"))
+                .disbursement(new BigDecimal("32000"))
+                .build();
+        Long firstClientAgreementId = service.createAgreement(firstAgreement);
+        AgreementRecord secondAgreement = AgreementRecord.builder()
+                .productCode("CL1.0")
+                .clientId(2L)
+                .term(12)
+                .interest(new BigDecimal("0.07"))
+                .disbursement(new BigDecimal("32000"))
+                .build();
+        Long secondClientAgreementId = service.createAgreement(secondAgreement);
+        List<Agreement> agreementsForFirstClient = agreementRepository.findByClientId(1L);
+        List<Agreement> agreementsForSecondClient = agreementRepository.findByClientId(2L);
         assertEquals(1, agreementsForFirstClient.size());
         assertEquals(1, agreementsForSecondClient.size());
         assertEquals(firstClientAgreementId, agreementsForFirstClient.get(0).getId());

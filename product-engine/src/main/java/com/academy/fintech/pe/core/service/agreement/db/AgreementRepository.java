@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgreementRepository extends CrudRepository<AgreementDAO, Long> {
-    List<AgreementDAO> findByClientId(Integer clientId);
+public interface AgreementRepository extends CrudRepository<Agreement, Long> {
+    List<Agreement> findByClientId(Long clientId);
 }

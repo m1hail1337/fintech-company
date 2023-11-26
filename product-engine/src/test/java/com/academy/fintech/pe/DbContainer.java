@@ -2,19 +2,19 @@ package com.academy.fintech.pe;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 
-public class DBContainer extends PostgreSQLContainer<DBContainer> {
+public class DbContainer extends PostgreSQLContainer<DbContainer> {
     private static final String IMAGE_VERSION = "postgres:14.1-alpine";
 
-    private static DBContainer container;
+    private static DbContainer container;
 
-    private DBContainer() {
+    private DbContainer() {
         super(IMAGE_VERSION);
     }
 
-    public static DBContainer getInstance() {
+    public static DbContainer getInstance() {
         if (container == null) {
-            container = new DBContainer()
-                    .withDatabaseName("test-db")
+            container = new DbContainer()
+                    .withDatabaseName("pe-test-db")
                     .withUsername("test")
                     .withPassword("test")
                     .withReuse(true);

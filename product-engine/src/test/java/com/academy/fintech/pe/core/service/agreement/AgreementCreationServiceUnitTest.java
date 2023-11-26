@@ -1,8 +1,8 @@
 package com.academy.fintech.pe.core.service.agreement;
 
-import com.academy.fintech.pe.core.service.agreement.db.AgreementDAO;
+import com.academy.fintech.pe.core.service.agreement.db.Agreement;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
-import com.academy.fintech.pe.core.service.product.db.ProductDAO;
+import com.academy.fintech.pe.core.service.product.db.Product;
 import com.academy.fintech.pe.core.service.product.db.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@DirtiesContext
+@DirtiesContext // gRPC requires
 public class AgreementCreationServiceUnitTest {
 
     @MockBean
@@ -38,7 +38,7 @@ public class AgreementCreationServiceUnitTest {
     @Autowired
     AgreementCreationService service;
 
-    static ProductDAO cashLoan1_0 = new ProductDAO(
+    static Product cashLoan1_0 = new Product(
             "CL1.0",
             3,
             18,
@@ -56,7 +56,7 @@ public class AgreementCreationServiceUnitTest {
     static void setUpMocksBehaviour() {
         when(productRepository.findById(cashLoan1_0.getCode())).thenReturn(Optional.of(cashLoan1_0));
         when(agreementRepository.save(any())).thenAnswer(invocation -> {
-            AgreementDAO savedAgreement = invocation.getArgument(0);
+            Agreement savedAgreement = invocation.getArgument(0);
             assertNull(savedAgreement.getId());
             savedAgreement.setId(currentAgreementId);   // т.к id в бд SERIAL
             currentAgreementId++;
@@ -66,11 +66,11 @@ public class AgreementCreationServiceUnitTest {
 
     @Test
     void createAgreement() {
-        AgreementDAO agreement = new AgreementDAO(
+        Agreement agreement = new Agreement(
                 cashLoan1_0.getCode(),
-                1,
-                12,
+                1L,
                 BigDecimal.valueOf(0.05),
+                12,
                 BigDecimal.valueOf(30000.00),
                 cashLoan1_0.getMinOriginationAmount()
         );
