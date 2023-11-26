@@ -15,7 +15,7 @@ public class ApplicationController extends ApplicationServiceGrpc.ApplicationSer
     public void create(ApplicationRequest request, StreamObserver<ApplicationResponse> responseObserver) {
         log.info("Got request: {}", request);
         // Add logic here...
-
+        // TODO: сделать все :)
         responseObserver.onNext(
                 ApplicationResponse.newBuilder()
                         .setApplicationId("test-application-id")
