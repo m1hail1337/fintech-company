@@ -70,11 +70,7 @@ public class OriginationController extends OriginationServiceGrpc.OriginationSer
 
     private void sendExistingApplicationIdInTrailers(ApplicationAlreadyExistsException e,
                                                      StreamObserver<CreationResponse> responseObserver) {
-        Metadata trailers = new Metadata();
-        trailers.put(
-                Metadata.Key.of("application-id", Metadata.ASCII_STRING_MARSHALLER),
-                e.getExistedApplicationId()
-        );
+        Metadata trailers = buildTrailersWithApplicationId(e.getExistedApplicationId());
         StatusException alreadyExistsStatus = Status.ALREADY_EXISTS
                 .withDescription(e.getMessage())
                 .asException(trailers);
@@ -94,14 +90,19 @@ public class OriginationController extends OriginationServiceGrpc.OriginationSer
 
     private void sendErrorIfApplicationNotExists(ApplicationNotExistsException e,
                                                  StreamObserver<CancellationResponse> responseObserver) {
-        Metadata trailers = new Metadata();
-        trailers.put(
-                Metadata.Key.of("application-id", Metadata.ASCII_STRING_MARSHALLER),
-                e.getNotExistedApplicationId()
-        );
+        Metadata trailers = buildTrailersWithApplicationId(e.getNotExistedApplicationId());
         StatusException notFoundStatus = Status.NOT_FOUND
                 .withDescription(e.getMessage())
                 .asException(trailers);
         responseObserver.onError(notFoundStatus);
+    }
+
+    private Metadata buildTrailersWithApplicationId(String applicationId) {
+        Metadata trailers = new Metadata();
+        trailers.put(
+                Metadata.Key.of("application-id", Metadata.ASCII_STRING_MARSHALLER),
+                applicationId
+        );
+        return trailers;
     }
 }

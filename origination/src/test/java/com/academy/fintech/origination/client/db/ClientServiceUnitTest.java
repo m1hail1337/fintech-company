@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 @DirtiesContext // gRPC requires
 @SpringBootTest
-public class ClientServiceTest {
+public class ClientServiceUnitTest {
 
     @MockBean
     private ClientRepository repository;

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.any;
 
 @DirtiesContext // gRPC requires
 @SpringBootTest
-public class ApplicationServiceTest {
+public class ApplicationServiceUnitTest {
 
     @MockBean
     private ApplicationRepository repository;

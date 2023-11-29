@@ -1,4 +1,4 @@
-package com.academy.fintech.origination;
+package com.academy.fintech;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -16,7 +16,8 @@ public class DbContainer extends PostgreSQLContainer<DbContainer> {
             container = new DbContainer()
                     .withDatabaseName("origination-test-db")
                     .withUsername("test")
-                    .withPassword("test");
+                    .withPassword("test")
+                    .withReuse(true);
         }
         return container;
     }
