@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 
 @GRpcService
 @RequiredArgsConstructor
-public class OriginationController extends OriginationServiceGrpc.OriginationServiceImplBase {
+public class OriginationService extends OriginationServiceGrpc.OriginationServiceImplBase {
 
     private final ApplicationCreationService creationService;
     private final ApplicationCancellationService cancellationService;

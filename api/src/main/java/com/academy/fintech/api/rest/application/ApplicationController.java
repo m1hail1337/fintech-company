@@ -1,6 +1,6 @@
 package com.academy.fintech.api.rest.application;
 
-import com.academy.fintech.api.core.application.ApplicationService;
+import com.academy.fintech.api.core.origination.OriginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/application")
 public class ApplicationController {
 
-    private final ApplicationService applicationService;
+    private final OriginationService originationService;
     private final ApplicationMapper applicationMapper;
 
     @PostMapping
     public String create(@RequestBody ApplicationRequest applicationRequest) {
-        return applicationService.createApplication(applicationMapper.mapRequestToDto(applicationRequest));
+        return originationService.createApplication(applicationMapper.mapRequestToDto(applicationRequest));
     }
 
 }

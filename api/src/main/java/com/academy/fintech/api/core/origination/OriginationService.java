@@ -1,4 +1,4 @@
-package com.academy.fintech.api.core.application;
+package com.academy.fintech.api.core.origination;
 
 import com.academy.fintech.api.core.origination.client.OriginationClientService;
 import com.academy.fintech.api.public_interface.application.dto.ApplicationDto;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ApplicationService {
+public class OriginationService {
 
     private final OriginationClientService originationClientService;
 
