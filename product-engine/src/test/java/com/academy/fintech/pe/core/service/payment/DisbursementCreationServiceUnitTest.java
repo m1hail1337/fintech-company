@@ -52,7 +52,7 @@ public class DisbursementCreationServiceUnitTest {
 
     static Agreement sampleAgreement = new Agreement(
             "CL1.0",
-            1L,
+            "1",
             BigDecimal.valueOf(0.05),
             12,
             BigDecimal.valueOf(30000.00),
@@ -104,7 +104,7 @@ public class DisbursementCreationServiceUnitTest {
                 version + 1
         );
         when(scheduleRepository.findFirstByAgreementNumberOrderByVersionDesc(existingAgreementId)).thenReturn(Optional.of(oldPaymentSchedule));
-        long newScheduleID = service.createSchedule(existingAgreementId, disbursementDate);
+        long newScheduleID = service.createDisbursement(existingAgreementId, disbursementDate);
         verify(scheduleRepository).save(expectedPaymentSchedule);
         assertEquals(expectedPaymentSchedule.getId(), newScheduleID);
     }
@@ -114,7 +114,7 @@ public class DisbursementCreationServiceUnitTest {
         currentScheduleId = 0;
         long existingAgreementId = 123L;
         PaymentSchedule expectedPaymentSchedule = new PaymentSchedule(1L, existingAgreementId, 1);
-        long newScheduleID = service.createSchedule(existingAgreementId, disbursementDate);
+        long newScheduleID = service.createDisbursement(existingAgreementId, disbursementDate);
         verify(scheduleRepository, times(1)).findFirstByAgreementNumberOrderByVersionDesc(existingAgreementId);
         verify(scheduleRepository).save(expectedPaymentSchedule);
         assertEquals(expectedPaymentSchedule.getId(), newScheduleID);
@@ -127,17 +127,17 @@ public class DisbursementCreationServiceUnitTest {
             assertEquals(sampleAgreement.getTerm(), units.size());
             return units;
         });
-        service.createSchedule(sampleAgreement.getId(), disbursementDate);
+        service.createDisbursement(sampleAgreement.getId(), disbursementDate);
         Agreement agreementWith1Term = new Agreement(
                 "CL1.0",
-                1L,
+                "1",
                 BigDecimal.valueOf(0.05),
                 1,
                 BigDecimal.valueOf(1000000.00),
                 BigDecimal.valueOf(10000.00)
         );
         agreementWith1Term.setId(2L);
-        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
+        service.createDisbursement(agreementWith1Term.getId(), disbursementDate);
     }
 
 
@@ -145,45 +145,45 @@ public class DisbursementCreationServiceUnitTest {
     void checkPaymentUnitCountWithTermOf34() {
         Agreement agreementWith34Term = new Agreement(
                 "CL1.0",
-                1L,
+                "1",
                 BigDecimal.valueOf(0.05),
                 34,
                 BigDecimal.valueOf(1000000.00),
                 BigDecimal.valueOf(10000.00)
         );
         agreementWith34Term.setId(1L);
-        service.createSchedule(agreementWith34Term.getId(), disbursementDate);
+        service.createDisbursement(agreementWith34Term.getId(), disbursementDate);
         Agreement agreementWith1Term = new Agreement(
                 "CL1.0",
-                1L,
+                "1",
                 BigDecimal.valueOf(0.05),
                 1,
                 BigDecimal.valueOf(1000000.00),
                 BigDecimal.valueOf(10000.00)
         );
         agreementWith1Term.setId(2L);
-        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
+        service.createDisbursement(agreementWith1Term.getId(), disbursementDate);
     }
 
     @Test
     void checkPaymentUnitCountWithTermOf1() {
         Agreement agreementWith1Term = new Agreement(
                 "CL1.0",
-                1L,
+                "1",
                 BigDecimal.valueOf(0.05),
                 1,
                 BigDecimal.valueOf(1000000.00),
                 BigDecimal.valueOf(10000.00)
         );
         agreementWith1Term.setId(2L);
-        service.createSchedule(agreementWith1Term.getId(), disbursementDate);
+        service.createDisbursement(agreementWith1Term.getId(), disbursementDate);
     }
 
     @Test
     void createSchedule() {
         PaymentSchedule expectedPaymentSchedule = new PaymentSchedule(1L, sampleAgreement.getId(), 1);
         currentScheduleId = 0L;
-        Long scheduleId = service.createSchedule(sampleAgreement.getId(), disbursementDate);
+        Long scheduleId = service.createDisbursement(sampleAgreement.getId(), disbursementDate);
         sampleAgreement.setDisbursementDate(disbursementDate);
         sampleAgreement.setNextPaymentDate(disbursementDate.plusMonths(1));
         verify(scheduleRepository).save(expectedPaymentSchedule);
@@ -197,9 +197,9 @@ public class DisbursementCreationServiceUnitTest {
     void createScheduleWithNotExistingAgreement() {
         long notExistingAgreementId = 999L;
         when(agreementRepository.findById(notExistingAgreementId)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> {
-            service.createSchedule(sampleAgreement.getId(), disbursementDate);
-        });
+        assertThrows(NoSuchElementException.class, () ->
+                service.createDisbursement(sampleAgreement.getId(), disbursementDate)
+        );
         verify(scheduleRepository, never()).save(any());
     }
 

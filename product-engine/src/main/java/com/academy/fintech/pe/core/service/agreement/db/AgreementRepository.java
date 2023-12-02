@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface AgreementRepository extends CrudRepository<Agreement, Long> {
-    List<Agreement> findByClientId(Long clientId);
+    List<Agreement> findByClientId(String clientId);
 }

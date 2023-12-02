@@ -5,7 +5,7 @@ services:
     image: postgres:14.1-alpine
     restart: always
     environment:
-      POSTGRES_DB: fintech
+      POSTGRES_DB: pe, origination
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:

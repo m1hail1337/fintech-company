@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 @Getter
 @Setter
 public class Agreement {
@@ -34,7 +36,7 @@ public class Agreement {
     private final String productCode;
 
     @Column(name = "client_id")
-    private final Long clientId;
+    private final String clientId;
 
     @Column(name = "interest")
     private final BigDecimal interest;

@@ -4,6 +4,7 @@ import com.academy.fintech.pe.core.service.agreement.db.Agreement;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
 import com.academy.fintech.pe.core.service.product.db.Product;
 import com.academy.fintech.pe.core.service.product.db.ProductRepository;
+import com.academy.fintech.pe.grpc.dto.AgreementDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,20 +67,21 @@ public class AgreementCreationServiceUnitTest {
 
     @Test
     void createAgreement() {
-        Agreement agreement = new Agreement(
-                cashLoan1_0.getCode(),
-                1L,
-                BigDecimal.valueOf(0.05),
-                12,
-                BigDecimal.valueOf(30000.00),
-                cashLoan1_0.getMinOriginationAmount()
-        );
-        Long actualID = service.createAgreement(
-                agreement.getClientId(),
-                agreement.getTerm(),
-                agreement.getPrincipalAmount().subtract(agreement.getOriginationAmount()),
-                agreement.getInterest(),
-                agreement.getProductCode()
+        Agreement agreement = Agreement.builder()
+                .productCode(cashLoan1_0.getCode())
+                .clientId("1")
+                .interest(BigDecimal.valueOf(0.05))
+                .term(12)
+                .principalAmount(BigDecimal.valueOf(30000.00))
+                .originationAmount(cashLoan1_0.getMinOriginationAmount())
+                .build();
+        Long actualID = service.createAgreement( AgreementDto.builder()
+                        .clientId(agreement.getClientId())
+                        .term(agreement.getTerm())
+                        .disbursement(agreement.getPrincipalAmount().subtract(agreement.getOriginationAmount()))
+                        .interest(agreement.getInterest())
+                        .productCode(agreement.getProductCode())
+                        .build()
         );
         verify(productRepository).findById(cashLoan1_0.getCode());
         verify(agreementRepository, times(1)).save(any());
@@ -90,11 +92,13 @@ public class AgreementCreationServiceUnitTest {
     void createAgreementWithWrongProduct() {
         String wrongProductCode = "SomeWrongProductCode";
         assertThrows(NoSuchElementException.class, () -> service.createAgreement(
-                1,
-                12,
-                BigDecimal.valueOf(30000.00),
-                BigDecimal.valueOf(0.05),
-                wrongProductCode
+                AgreementDto.builder()
+                        .clientId("1")
+                        .term(12)
+                        .disbursement(BigDecimal.valueOf(30000.00))
+                        .interest(BigDecimal.valueOf(0.05))
+                        .productCode(wrongProductCode)
+                        .build()
         ));
         verify(productRepository).findById(wrongProductCode);
         verify(agreementRepository, never()).save(any());

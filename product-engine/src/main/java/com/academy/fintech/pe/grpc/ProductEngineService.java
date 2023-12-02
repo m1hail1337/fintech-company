@@ -7,11 +7,10 @@ import com.academy.fintech.pe.DisbursementCreationResponse;
 import com.academy.fintech.pe.ProductEngineServiceGrpc;
 import com.academy.fintech.pe.core.service.agreement.AgreementCreationService;
 import com.academy.fintech.pe.core.service.payment.DisbursementCreationService;
-import com.academy.fintech.pe.grpc.dto.AgreementRecord;
+import com.academy.fintech.pe.grpc.dto.AgreementDto;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.lognet.springboot.grpc.GRpcService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +25,7 @@ public class ProductEngineService extends ProductEngineServiceGrpc.ProductEngine
 
     @Override
     public void createAgreement(AgreementRequest request, StreamObserver<AgreementResponse> responseObserver) {
-        AgreementRecord agreementToCreate = AgreementRecord.builder()
+        AgreementDto agreementToCreate = AgreementDto.builder()
                 .clientId(request.getClientId())
                 .term(request.getLoanTerm())
                 .disbursement(new BigDecimal(request.getDisbursementAmount()))
@@ -48,7 +47,7 @@ public class ProductEngineService extends ProductEngineServiceGrpc.ProductEngine
                                    StreamObserver<DisbursementCreationResponse> responseObserver) {
         long agreementId = request.getAgreementId();
         LocalDate disbursementDate = LocalDate.parse(request.getDisbursementDate());
-        Long scheduleId = disbursementCreationService.createSchedule(agreementId, disbursementDate);
+        Long scheduleId = disbursementCreationService.createDisbursement(agreementId, disbursementDate);
         responseObserver.onNext(
                 DisbursementCreationResponse.newBuilder()
                         .setPaymentScheduleId(scheduleId)

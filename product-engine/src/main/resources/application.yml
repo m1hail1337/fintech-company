@@ -2,6 +2,6 @@ spring:
   liquibase:
     change-log: classpath:/db/db.changelog-master.yaml
   datasource:
-    url: jdbc:postgresql://localhost:61156/fintech
+    url: jdbc:postgresql://localhost:61156/pe
     username: admin
     password: admin

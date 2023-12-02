@@ -6,5 +6,9 @@ import java.math.BigDecimal;
 
 @Builder
 // TODO: Dto для передачи между сервисами
-public record AgreementRecord(long clientId, int term, BigDecimal disbursement, BigDecimal interest, String productCode)
-{}
+public record AgreementDto(
+        String clientId,
+        int term,
+        BigDecimal disbursement,
+        BigDecimal interest,
+        String productCode) {}

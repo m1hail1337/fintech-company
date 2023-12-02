@@ -1,7 +1,6 @@
 package com.academy.fintech.pe.core.service.payment;
 
 import com.academy.fintech.pe.DbContainer;
-import com.academy.fintech.pe.core.service.agreement.AgreementCreationService;
 import com.academy.fintech.pe.core.service.agreement.db.Agreement;
 import com.academy.fintech.pe.core.service.agreement.db.AgreementRepository;
 import com.academy.fintech.pe.core.service.payment.schedule.PaymentSchedule;
@@ -14,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -24,7 +22,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
 @Testcontainers
 @DirtiesContext // gRPC requires
 @SpringBootTest
@@ -44,9 +41,6 @@ public class DisbursementCreationServiceIntegrationTest {
     DisbursementCreationService disbursementService;
 
     @Autowired
-    AgreementCreationService agreementService;
-
-    @Autowired
     AgreementRepository agreementRepository;
 
     @Autowired
@@ -61,15 +55,19 @@ public class DisbursementCreationServiceIntegrationTest {
 
     @Test
     void createDisbursement() {
+        String clientId = "createDisbursement-client";
         LocalDate disbursementDate = LocalDate.of(2023, 11, 21);
-        Long agreementId = agreementService.createAgreement(
-                1,
-                12,
-                BigDecimal.valueOf(32000),
-                BigDecimal.valueOf(0.07),
-                "CL1.0"
-        );
-        Long scheduleId = disbursementService.createSchedule(agreementId, disbursementDate);
+        Long agreementId = agreementRepository.save(
+                Agreement.builder()
+                        .clientId(clientId)
+                        .term(12)
+                        .originationAmount(BigDecimal.valueOf(2000))
+                        .principalAmount(BigDecimal.valueOf(30000))
+                        .interest(BigDecimal.valueOf(0.07))
+                        .productCode("CL1.0")
+                        .build()
+        ).getId();
+        Long scheduleId = disbursementService.createDisbursement(agreementId, disbursementDate);
         PaymentSchedule scheduleQuery = scheduleRepository.findById(scheduleId).orElseThrow();
         assertEquals(1, scheduleQuery.getVersion());
         assertEquals(agreementId, scheduleQuery.getAgreementNumber());
