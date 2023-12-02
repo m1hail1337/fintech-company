@@ -13,14 +13,7 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
 				GsonAutoConfiguration.class,
 				MultipartAutoConfiguration.class,
 				WebSocketServletAutoConfiguration.class,
-				NettyAutoConfiguration.class,
-
-//				**Use it if work via Rest**
-
-//				RestTemplateAutoConfiguration.class,
-//				HttpMessageConvertersAutoConfiguration.class,
-//				HttpEncodingAutoConfiguration.class,
-//				ErrorMvcAutoConfiguration.class
+				NettyAutoConfiguration.class
 		}
 )
 public class Application {

@@ -18,7 +18,9 @@ subprojects {
     dependencies {
         // You can add common dependencies here...
         implementation libs.spring.web
-
+        implementation libs.postgresql.driver
+        implementation libs.liquibase
+        implementation libs.spring.data
         implementation libs.lombok
         annotationProcessor libs.lombok
     }
