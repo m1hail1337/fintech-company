@@ -13,7 +13,7 @@ CREATE TABLE Product (
 CREATE TABLE Agreement (
     id SERIAL PRIMARY KEY,
     product_code VARCHAR(10) REFERENCES Product(code),
-    client_id INT,
+    client_id VARCHAR(40),
     interest DECIMAL (5, 4),
     term INT,
     principal_amount DECIMAL(10, 2),

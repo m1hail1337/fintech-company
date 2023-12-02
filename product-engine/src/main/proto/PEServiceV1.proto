@@ -10,7 +10,7 @@ service ProductEngineService {
 }
 
 message AgreementRequest {
-  int64 client_id = 1;
+  string client_id = 1;
   int32 loan_term = 2;
   string disbursement_amount = 3;
   string interest = 4;
