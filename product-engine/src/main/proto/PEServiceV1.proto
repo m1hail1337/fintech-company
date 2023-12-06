@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package com.academy.fintech.pe;
+
+option java_multiple_files = true;
+
+service ProductEngineService {
+  rpc CreateAgreement(AgreementRequest) returns (AgreementResponse) {}
+  rpc CreateDisbursement(DisbursementCreationRequest) returns (DisbursementCreationResponse) {}
+}
+
+message AgreementRequest {
+  string client_id = 1;
+  int32 loan_term = 2;
+  string disbursement_amount = 3;
+  string interest = 4;
+  string product_code = 5;
+}
+
+message AgreementResponse {
+  int64 agreement_id = 1;
+}
+
+message DisbursementCreationRequest {
+  string disbursement_date = 1;
+  int64 agreement_id = 2;
+}
+
+message DisbursementCreationResponse {
+  int64 payment_schedule_id = 1;
+}
