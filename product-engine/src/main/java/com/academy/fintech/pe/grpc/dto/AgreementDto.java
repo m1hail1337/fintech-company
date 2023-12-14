@@ -5,7 +5,6 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-// TODO: Dto для передачи между сервисами
 public record AgreementDto(
         String clientId,
         int term,

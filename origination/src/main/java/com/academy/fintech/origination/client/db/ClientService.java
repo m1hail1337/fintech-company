@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -15,6 +16,11 @@ public class ClientService {
 
     public Optional<Client> findClientByEmail(String email) {
         return repository.findByEmail(email);
+    }
+
+    public Optional<BigDecimal> getSalaryByClientId(String clientId) {
+        Optional<Client> client = repository.findById(clientId);
+        return client.map(Client::getSalary);
     }
 
     public Client saveClient(ClientDto clientDto) {

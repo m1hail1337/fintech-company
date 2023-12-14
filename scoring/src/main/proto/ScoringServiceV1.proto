@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.academy.fintech.scoring;
+
+option java_multiple_files = true;
+
+service ScoringService {
+  rpc ScoreSolvency(ScoreRequest) returns (ScoreResponse) {}
+}
+
+message ScoreRequest {
+  string client_id = 1;
+  uint32 salary = 2;
+  uint32 disbursement_amount = 3;
+}
+
+message ScoreResponse {
+  uint32 solvency_score = 1;
+}

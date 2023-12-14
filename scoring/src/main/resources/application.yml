@@ -1,0 +1,11 @@
+server:
+  port: 8085
+grpc:
+  host: localhost
+  port: 9095
+scoring:
+  client:
+    pe:
+      grpc:
+        host: localhost
+        port: 9093

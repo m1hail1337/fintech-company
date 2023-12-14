@@ -3,18 +3,9 @@ plugins {
 }
 
 dependencies {
-    implementation libs.spring.grpc
-    implementation libs.javax.annotation
-
-    implementation libs.protobuf.java.util
-    implementation libs.grpc.protobuf
-    implementation libs.grpc.stub
-    implementation libs.protobuf.java
-
-    testImplementation libs.jupiter
-    testImplementation libs.testcontainers.jupiter
-    testImplementation libs.testcontainers.postgres
-    testImplementation libs.spring.test
+    implementation libs.liquibase
+    implementation libs.postgresql.driver
+    implementation libs.spring.data
 }
 
 protobuf {

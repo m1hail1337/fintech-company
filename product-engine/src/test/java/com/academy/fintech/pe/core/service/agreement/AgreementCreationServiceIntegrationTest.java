@@ -74,7 +74,7 @@ public class AgreementCreationServiceIntegrationTest {
                         .productCode("CL1.0")
                         .build()
         );
-        List<Agreement> queryResult = agreementRepository.findByClientId(clientId);
+        List<Agreement> queryResult = agreementRepository.findAllByClientId(clientId);
         assertEquals(1, queryResult.size());
         assertEquals(expected, queryResult.get(0).getId());
     }
@@ -100,7 +100,7 @@ public class AgreementCreationServiceIntegrationTest {
                         .productCode("CL1.0")
                         .build()
         );
-        List<Agreement> agreementsByQuery = agreementRepository.findByClientId(clientId);
+        List<Agreement> agreementsByQuery = agreementRepository.findAllByClientId(clientId);
         assertEquals(2, agreementsByQuery.size());
         List<Long> agreementIDs = agreementsByQuery.stream().map(Agreement::getId).toList();
         assertTrue(agreementIDs.contains(firstAgreementId));
@@ -127,8 +127,8 @@ public class AgreementCreationServiceIntegrationTest {
                 .disbursement(new BigDecimal("32000"))
                 .build();
         Long secondClientAgreementId = service.createAgreement(secondAgreement);
-        List<Agreement> agreementsForFirstClient = agreementRepository.findByClientId(firstClientId);
-        List<Agreement> agreementsForSecondClient = agreementRepository.findByClientId(secondClientId);
+        List<Agreement> agreementsForFirstClient = agreementRepository.findAllByClientId(firstClientId);
+        List<Agreement> agreementsForSecondClient = agreementRepository.findAllByClientId(secondClientId);
         assertEquals(1, agreementsForFirstClient.size());
         assertEquals(1, agreementsForSecondClient.size());
         assertEquals(firstClientAgreementId, agreementsForFirstClient.get(0).getId());

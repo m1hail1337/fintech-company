@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package com.academy.fintech.pe;
+
+option java_multiple_files = true;
+
+service ProductEngine4Scoring {
+  rpc GetMaxPayment(MaxPaymentRequest) returns (MaxPaymentResponse) {}
+  rpc GetLoansOverdue(LoansOverdueRequest) returns (LoansOverdueResponse) {}
+}
+
+message MaxPaymentRequest {
+  int32 loan_term = 1;
+  string disbursement_amount = 2;
+  string interest = 3;
+}
+
+message MaxPaymentResponse {
+  string payment_amount = 1;
+}
+
+message LoansOverdueRequest {
+  string client_id = 1;
+}
+
+message LoansOverdueResponse {
+  repeated uint32 overdue_days = 1;
+}

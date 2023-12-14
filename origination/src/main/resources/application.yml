@@ -10,3 +10,9 @@ spring:
 grpc:
   port: 9094
   enable-reflection: true
+origination:
+  client:
+    scoring:
+      grpc:
+        host: localhost
+        port: 9095

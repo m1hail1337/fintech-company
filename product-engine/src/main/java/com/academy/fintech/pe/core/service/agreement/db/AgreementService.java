@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,11 @@ public class AgreementService {
         Agreement agreement = buildAgreement(agreementDto, principal, origination);
         agreementRepository.save(agreement);
         return agreement.getId();
+    }
+
+    public List<Long> findAllAgreementIdByClientId(String clientId) {
+        List<Agreement> agreements = agreementRepository.findAllByClientId(clientId);
+        return agreements.stream().map(Agreement::getId).toList();
     }
 
     public void saveAgreement(Agreement agreement) {

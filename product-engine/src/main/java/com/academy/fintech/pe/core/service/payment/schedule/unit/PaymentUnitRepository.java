@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface PaymentUnitRepository extends CrudRepository<PaymentUnit, PaymentPk> {
-
     List<PaymentUnit> findAllByPaymentPk_ScheduleId(Long scheduleId);
 }
