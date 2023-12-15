@@ -26,6 +26,10 @@ public class PaymentUnitService {
 
     private final AgreementService agreementService;
 
+    public void saveAllUnits(Iterable<PaymentUnit> units) {
+        repository.saveAll(units);
+    }
+
     public List<PaymentUnit> createPaymentUnits(Agreement agreement, PaymentSchedule schedule) {
         List<PaymentUnit> paymentUnits = new ArrayList<>();
         int periods = agreement.getTerm();
@@ -60,9 +64,7 @@ public class PaymentUnitService {
         List<Long> scheduleIds = getScheduleIds(agreementIds);
         List<PaymentUnit> allClientPayments = getAllPaymentsFromSchedules(scheduleIds);
         List<PaymentUnit> overduePayments = findOverduePaymentUnits(allClientPayments);
-        return overduePayments.stream().mapToInt(payment ->
-                (int) ChronoUnit.DAYS.between(LocalDate.now(), payment.getPaymentDate())
-        ).boxed().collect(Collectors.toList());
+        return createOverdueTermList(overduePayments);
     }
 
     private List<PaymentUnit> getAllPaymentsFromSchedules(List<Long> scheduleIds) {
@@ -81,12 +83,14 @@ public class PaymentUnitService {
         return scheduleIds;
     }
 
-    public void saveAllUnits(Iterable<PaymentUnit> units) {
-        repository.saveAll(units);
-    }
-
     private List<PaymentUnit> findOverduePaymentUnits(List<PaymentUnit> paymentUnits) {
         return paymentUnits.stream().filter(payment -> payment.getStatus() == PaymentUnitStatus.OVERDUE).toList();
+    }
+
+    private List<Integer> createOverdueTermList(List<PaymentUnit> overduePayments) {
+        return overduePayments.stream().mapToInt(payment ->
+                (int) ChronoUnit.DAYS.between(LocalDate.now(), payment.getPaymentDate())
+        ).boxed().collect(Collectors.toList());
     }
 
     private Agreement buildTempAgreement(AgreementDto agreementDto) {

@@ -82,7 +82,7 @@ public class ApplicationService {
             ApplicationStatus status = statusByScoringResult(score);
             application.setStatus(status);
             saveApplication(application);
-            // sendScoringResultEmail(application); - Not will be implemented
+            // Notifications.sendScoringResultEmail(application); - Not will be implemented
         }
     }
 

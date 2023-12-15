@@ -19,7 +19,8 @@ public class Scorer {
 
     private int getSalaryScore(BigDecimal disbursement, BigDecimal salary) {
         BigDecimal maxPayment = productEngineService.getMaxPayment(disbursement);
-        if (salary.compareTo(maxPayment.multiply(BigDecimal.valueOf(3))) >= 0) {
+        BigDecimal maxPayment3Times = maxPayment.multiply(BigDecimal.valueOf(3));
+        if (salary.compareTo(maxPayment3Times) >= 0) {
             return 1;
         }
         return 0;
@@ -29,9 +30,13 @@ public class Scorer {
         List<Integer> overdueDays = productEngineService.getLoansOverdue(clientId);
         if (overdueDays.isEmpty()) {
             return 1;
-        } else if (overdueDays.stream().anyMatch(day -> day > 7)) {
+        } else if (hasOverdueOver7Days(overdueDays)) {
             return -1;
         }
         return 0;
+    }
+
+    private boolean hasOverdueOver7Days(List<Integer> overdueDays) {
+        return overdueDays.stream().anyMatch(day -> day > 7);
     }
 }
